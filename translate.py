@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 '''
-- create github repository
 x create sample translation file
+x create github repository
+x check user input
 - get text from document to translate
 - split text into segments
 - get translation for each segment from deepl, one by one
