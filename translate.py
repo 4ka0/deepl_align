@@ -18,6 +18,12 @@ from environs import Env
 
 
 def check_user_input(user_input):
+    """
+    Checks user input.
+    Returns - True/False regarding whether user input is valid/invalid.
+            - The file to be translated.
+            - A glossary file if given.
+    """
 
     format_message = (
         "Expected input: python3 translate.py translation.docx glossary.txt\n"
@@ -28,14 +34,14 @@ def check_user_input(user_input):
     if len(user_input) < 2 or len(user_input) > 3:
         print("\nError: Incorrect number of arguments.")
         print(format_message)
-        return False
+        return False, None, None
 
     # 2nd arg should be a docx file
     translation_file = user_input[1]
     if not translation_file.lower().endswith('.docx'):
         print("\nError: Second argument should be a docx file.")
         print(format_message)
-        return False
+        return False, None, None
 
     # 3rd arg, if present, should be a txt file
     if len(user_input) == 3:
@@ -43,14 +49,18 @@ def check_user_input(user_input):
         if not glossary_file.lower().endswith('.txt'):
             print("\nError: Third argument should be a txt file.")
             print(format_message)
-            return False
+            return False, None, None
+    else:
+        glossary_file = None
 
-    return True
+    return True, translation_file, glossary_file
 
 
 if __name__ == "__main__":
 
-    if check_user_input(sys.argv):
+    valid, translation_file, glossary_file = check_user_input(sys.argv)
+
+    if valid:
 
         # Get DeepL auth key from env file.
         env = Env()
