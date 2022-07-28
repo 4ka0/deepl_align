@@ -18,6 +18,8 @@ from .. import translate
         (['translate.py', 'source.docx', 'glossary.txt', 'random.pdf'], False),
         # Incorrect translation file type.
         (['translate.py', 'source.doc'], False),
+        # Incorrect glossary file type.
+        (['translate.py', 'source.docx', 'glossary.docx'], False),
         # Just glossary file given.
         (['translate.py', 'glossary.txt'], False),
     ]
