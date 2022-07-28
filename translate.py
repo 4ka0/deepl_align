@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
         translator = deepl.Translator(auth_key)
 
-        source_text = "情報処理装置に関する発明です。"
+        source_text = "情報処理装置"
         source_lang = "JA"
         target_lang = "en-US"
 
