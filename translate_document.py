@@ -2,14 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-x create sample translation file
-x create github repository
-x check user input
-- get text from document to translate
-- split text into segments
-- get translation for each segment from deepl, one by one
-- save as list of segments, each segment containing source and target strings
-- build tmx file from list of segment pairs
+Uses the DeepL API to translate a single document in one go.
 '''
 
 import sys
@@ -110,30 +103,4 @@ if __name__ == "__main__":
     valid, translation_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
-
         translate_document(translation_file, glossary_file)
-
-        """
-        env = Env()
-        env.read_env()
-        auth_key = env.str("AUTH_KEY")
-
-        translator = deepl.Translator(auth_key)
-
-        source_text = "情報処理装置"
-        source_lang = "JA"
-        target_lang = "en-US"
-
-        result = translator.translate_text(
-            source_text,
-            source_lang=source_lang,
-            target_lang=target_lang
-        )
-
-        print("\nEngine output: ")
-        print(result.text + "\n")
-
-        usage = translator.get_usage()
-
-        print(str(usage) + "\n")
-        """
