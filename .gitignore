@@ -6,4 +6,5 @@
 __pycache__/
 media/
 htmlcov/
-PCT-JP.docx
+.docx
+source_docs/

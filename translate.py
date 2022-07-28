@@ -27,7 +27,7 @@ def check_user_input(user_input):
 
     format_message = (
         "Expected input: python3 translate.py translation.docx glossary.txt\n"
-        "(glossary.txt is optional)\n"
+        "(glossary.txt is optional.)\n"
     )
 
     # Should be 2 or 3 args
@@ -56,13 +56,64 @@ def check_user_input(user_input):
     return True, translation_file, glossary_file
 
 
+def translate_document(translation_file, glossary_file):
+    """
+    Translates user specified document using the DeepL API.
+    """
+
+    auth_key = get_auth_key()
+    translator = deepl.Translator(auth_key)
+    output_path = "small-PCT-EN.docx"  # Better to build new filename from source file
+
+    try:
+        translator.translate_document_from_filepath(
+            translation_file,
+            output_path,
+            source_lang="JA",
+            target_lang="en-US",
+        )
+
+        print("\nDocument translation downloaded.")
+        usage = translator.get_usage()
+        print(str(usage) + "\n")
+
+    except deepl.DocumentTranslationException as error:
+        # If an error occurs during document translation after the document was
+        # already uploaded, a DocumentTranslationException is raised. The
+        # document_handle property contains the document handle that may be used to
+        # later retrieve the document from the server, or contact DeepL support.
+        doc_id = error.document_handle.id
+        doc_key = error.document_handle.key
+        print("Error after upload.")
+        print(error)
+        print("ID: " + doc_id)
+        print("Key: " + doc_key)
+
+    except deepl.DeepLException as error:
+        # Errors during upload raise a DeepLException
+        print("Error during upload.")
+        print(error)
+
+
+def get_auth_key():
+    """
+    Gets the DeepL auth key from env file.
+    """
+    env = Env()
+    env.read_env()
+    auth_key = env.str("AUTH_KEY")
+    return auth_key
+
+
 if __name__ == "__main__":
 
     valid, translation_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
 
-        # Get DeepL auth key from env file.
+        translate_document(translation_file, glossary_file)
+
+        """
         env = Env()
         env.read_env()
         auth_key = env.str("AUTH_KEY")
@@ -85,3 +136,4 @@ if __name__ == "__main__":
         usage = translator.get_usage()
 
         print(str(usage) + "\n")
+        """
