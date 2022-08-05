@@ -14,6 +14,7 @@ x get text from document to translate
 
 import sys
 import deepl
+from docx import Document
 from environs import Env
 
 
@@ -56,6 +57,28 @@ def check_user_input(user_input):
     return True, translation_file, glossary_file
 
 
+def get_target_sentences(user_doc):
+    document = Document(user_doc)
+    # store text in paragraph strings
+    segments = []
+    for para in document.paragraphs:
+        # split again if para contains multiple sentences
+        if para.text.count("。") >= 2:
+            # could be 2 or more sentences
+            # split para into sentences
+            # add each sentence to segments list
+            sentences = para.text.split("。")
+            for sentence in sentences:
+                # add each single sentence to segments list
+                # split() creates empty string at end, "if sentence" skips this
+                # split() removes the period delim, so have to add this back on
+                if sentence:
+                    segments.append(sentence + "。")
+        else:
+            segments.append(para.text)
+    return segments
+
+
 if __name__ == "__main__":
 
     valid, translation_file, glossary_file = check_user_input(sys.argv)
@@ -73,8 +96,11 @@ if __name__ == "__main__":
         """
 
         # Get text from source text file
-        # Split into strings
+        sentences = get_target_sentences(sys.argv[1])
+        for item in sentences:
+            print(item)
 
+        """
         env = Env()
         env.read_env()
         auth_key = env.str("AUTH_KEY")
@@ -97,3 +123,4 @@ if __name__ == "__main__":
         usage = translator.get_usage()
 
         print(str(usage) + "\n")
+        """
