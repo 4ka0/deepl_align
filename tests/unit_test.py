@@ -32,7 +32,7 @@ def test_user_input_check(user_input, expected):
 def test_get_target_sentences():
 
     # Need to give Document the full path to the test docx file.
-    # Therefore need to full path to the directory where this test .py file is located.
+    # Therefore need full path to directory for this test .py.
     # Then add the location of the test docx file to this path.
     current_dir = os.path.dirname(os.path.realpath(__file__))
     test_file_path = "source_docs/small-PCT-JP.docx"
