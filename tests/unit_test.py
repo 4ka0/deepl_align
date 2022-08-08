@@ -29,7 +29,7 @@ def test_user_input_check(user_input, expected):
     assert translate.check_user_input(user_input) == expected
 
 
-def test_get_target_segments():
+def test_get_source_segments():
 
     # Need to give Document the absolute path to the test docx file.
     # Therefore need the full path to this 'unit_test.py' file.
@@ -64,6 +64,6 @@ def test_get_target_segments():
         "なお、表示部３は、非シースルータイプの表示部であってもよい。",
         "この場合、撮像部４により撮像された画像が表示部３上に表示される。",
     ]
-    output = translate.get_target_segments(full_file_path)
+    output = translate.get_source_segments(full_file_path)
 
     assert output == expected

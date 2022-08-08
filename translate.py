@@ -57,69 +57,58 @@ def check_user_input(user_input):
     return True, translation_file, glossary_file
 
 
-def get_target_segments(user_doc):
-    document = Document(user_doc)
-    segments = []
+def get_source_segments(source_file):
+    """
+    Reads in text from user-specified docx file.
+    File is already split into paragraphs by Document module.
+    Text is further split into sentences if a paragraph contains multiple sentences.
+    """
+
+    document = Document(source_file)
+    source_segments = []  # A list of strings, each representing a segment of source text.
+
     for para in document.paragraphs:
         # Split again if paragraph contains multiple sentences.
         if para.text.count("。") >= 2:
             sentences = para.text.split("。")
             for sentence in sentences:
-                # Add each single sentence to segments list.
-                # However:
-                # If "。" appears at the end of a string, split() creates an empty string
-                # representing the substring that follows "。". Using "if sentence" skips
-                # such empty strings.
-                # Also, split() removes the "。" delim, so have to add this back on.
+                # Add each single sentence to source_segments list.
+                # However, if "。" appears at the end of a string, split() creates an empty string
+                # representing the substring that follows "。". Using "if sentence" skips such
+                # empty strings. Also, split() removes the "。" delim, so have to add this back on.
                 if sentence:
-                    segments.append(sentence + "。")
+                    source_segments.append(sentence + "。")
         else:
-            segments.append(para.text)
-    return segments
+            source_segments.append(para.text)
+
+    return source_segments
+
+
+def translate_segments(source_segments, glossary_file):
+
+    # Get the DeepL auth key from env file
+    env = Env()
+    env.read_env()
+    auth_key = env.str("AUTH_KEY")
+
+    # Get translation from DeepL
+    translator = deepl.Translator(auth_key)
+
+    for segment in source_segments:
+        print("\n" + segment)
+        result = translator.translate_text(segment, source_lang="JA", target_lang="en-US",)
+        print(result.text)
+
+    usage = translator.get_usage()
+    print("\n" + str(usage) + "\n")
 
 
 if __name__ == "__main__":
 
-    valid, translation_file, glossary_file = check_user_input(sys.argv)
+    valid, source_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
 
-        # translate_document(translation_file, glossary_file)
+        source_segments = get_source_segments(source_file)
 
-        """
-        Minimum word count of 50,000 for each document translated.
-        Better to not translate document, but instead to split the document
-        into a list of strings beforehand, and to use the basic DeepL
-        translator to then translate the strings one by one and collect
-        corresponding translations to build a tmx file.
-        """
-
-        # Get text from source text file
-        sentences = get_target_segments(sys.argv[1])
-        for item in sentences:
-            print(item)
-
-        """
-        env = Env()
-        env.read_env()
-        auth_key = env.str("AUTH_KEY")
-
-        translator = deepl.Translator(auth_key)
-
-        source_text = "情報処理装置"
-        source_lang = "JA"
-        target_lang = "en-US"
-
-        result = translator.translate_text(
-            source_text,
-            source_lang=source_lang,
-            target_lang=target_lang
-        )
-
-        print("\nEngine output: ")
-        print(result.text + "\n")
-
-        usage = translator.get_usage()
-
-        print(str(usage) + "\n")
-        """
+        target_segments = translate_segments(source_segments, glossary_file)
