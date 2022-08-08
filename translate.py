@@ -59,19 +59,18 @@ def check_user_input(user_input):
 
 def get_target_sentences(user_doc):
     document = Document(user_doc)
-    # store text in paragraph strings
     segments = []
     for para in document.paragraphs:
-        # split again if para contains multiple sentences
+        # Split again if paragraph contains multiple sentences.
         if para.text.count("。") >= 2:
-            # could be 2 or more sentences
-            # split para into sentences
-            # add each sentence to segments list
             sentences = para.text.split("。")
             for sentence in sentences:
-                # add each single sentence to segments list
-                # split() creates empty string at end, "if sentence" skips this
-                # split() removes the period delim, so have to add this back on
+                # Add each single sentence to segments list.
+                # However:
+                # If "。" appears at the end of a string, split() creates an empty string
+                # representing the substring that follows "。". Using "if sentence" skips
+                # such empty strings.
+                # Also, split() removes the "。" delim, so have to add this back on.
                 if sentence:
                     segments.append(sentence + "。")
         else:
