@@ -31,9 +31,9 @@ def test_user_input_check(user_input, expected):
 
 def test_get_target_sentences():
 
-    # Need to give Document the full path to the test docx file.
-    # Therefore need full path to directory for this test .py.
-    # Then add the location of the test docx file to this path.
+    # Need to give Document the absolute path to the test docx file.
+    # Therefore need the full path to this 'unit_test.py' file.
+    # Then need to add the location of the test docx file to the path.
     current_dir = os.path.dirname(os.path.realpath(__file__))
     test_file_path = "source_docs/small-PCT-JP.docx"
     full_file_path = current_dir + "/" + test_file_path
@@ -65,4 +65,5 @@ def test_get_target_sentences():
         "この場合、撮像部４により撮像された画像が表示部３上に表示される。",
     ]
     output = translate.get_target_sentences(full_file_path)
+
     assert output == expected
