@@ -57,7 +57,7 @@ def check_user_input(user_input):
     return True, translation_file, glossary_file
 
 
-def get_target_sentences(user_doc):
+def get_target_segments(user_doc):
     document = Document(user_doc)
     segments = []
     for para in document.paragraphs:
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         """
 
         # Get text from source text file
-        sentences = get_target_sentences(sys.argv[1])
+        sentences = get_target_segments(sys.argv[1])
         for item in sentences:
             print(item)
 
