@@ -58,7 +58,7 @@ def get_source_segments(source_file):
     """
 
     document = Document(source_file)
-    source_segments = []  # A list of strings, each representing a segment of source text.
+    segments = []
 
     for para in document.paragraphs:
 
@@ -72,14 +72,16 @@ def get_source_segments(source_file):
                 # representing the substring that follows "。". Using "if sentence" skips such
                 # empty strings. Also, split() removes the "。" delim, so have to add this back on.
                 if sentence:
-                    source_segments.append(sentence + "。")
+                    segment = Segment(source_text=sentence + "。", target_text="")
+                    segments.append(segment)
         else:
-            source_segments.append(para.text)
+            segment = Segment(source_text=para.text, target_text="")
+            segments.append(segment)
 
-    return source_segments
+    return segments
 
 
-def translate_segments(source_segments, glossary_file):
+def translate_segments(segments, glossary_file):
     """
     Obtains translations for source_segments by calling the DeepL API.
     Returns list of Segment objects with the source_text and target_text
@@ -96,16 +98,13 @@ def translate_segments(source_segments, glossary_file):
 
     # Add in usage check here, if close to 500000 ...
 
-    segments = []
-
-    for source_text in source_segments:
+    for segment in segments:
         target_text = translator.translate_text(
-            source_text,
+            segment.source_text,
             source_lang="JA",
             target_lang="en-US",
         )
-        segment = Segment(source_text=source_text, target_text=target_text)
-        segments.append(segment)
+        segment.target_text = target_text
 
     usage = translator.get_usage()
     print("\n" + str(usage) + "\n")
