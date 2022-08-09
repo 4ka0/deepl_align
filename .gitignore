@@ -8,3 +8,4 @@ media/
 htmlcov/
 .docx
 source_docs/
+document_translate.py
