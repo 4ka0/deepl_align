@@ -5,6 +5,20 @@ import os
 import pytest
 
 from .. import translate
+from .. translate import Segment
+
+
+def test_constructor():
+    '''
+    Test instantiation
+    '''
+    s = Segment('なお、正孔輸送層12は、NiO、（またはMoO3）等の無機材料を'
+                '含んでいてもよい。',
+                'moreover, the positive  hole transport layers 12 may '
+                'include an inorganic material such as NiO (or MoO3].',
+                '', '', [], [], False, {}, {}, False, False, False, False,
+                False, False, [], False, [], False, False, [])
+    assert isinstance(s, Segment)
 
 
 @pytest.mark.parametrize(
