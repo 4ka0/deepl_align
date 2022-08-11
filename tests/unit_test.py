@@ -27,6 +27,9 @@ class Translator:
     def get_usage(self):
         return self.usage
 
+    def translate_text(self, source_text, source_lang, target_lang):
+        return "mock_target_string"
+
 
 @pytest.fixture
 def mock_translator():
@@ -62,6 +65,18 @@ def segment_object():
         target_text="The positive hole transport layers 12 may include an inorganic material.",
     )
     return segment
+
+
+@pytest.fixture
+def segments_list():
+    segments = []
+    for i in range(10):
+        segment = Segment(
+            source_text="正孔輸送層12は、無機材料を含む。",
+            target_text="",
+        )
+        segments.append(segment)
+    return segments
 
 
 @pytest.fixture
@@ -146,3 +161,9 @@ def test_check_deepl_usage_fail(mock_translator):
     source_char_count = 200000
     output = translate.check_deepl_usage(source_char_count, mock_translator)
     assert output is False
+
+
+def test_translate_segments(mock_translator, segments_list):
+    segments = translate.translate_segments(mock_translator, segments_list, None)
+    for segment in segments:
+        assert segment.target_text == "mock_target_string"
