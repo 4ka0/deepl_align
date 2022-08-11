@@ -68,7 +68,7 @@ def segment_object():
 
 
 @pytest.fixture
-def segments_list():
+def list_of_segment_objects():
     segments = []
     for i in range(10):
         segment = Segment(
@@ -80,7 +80,7 @@ def segments_list():
 
 
 @pytest.fixture
-def segment_objects_from_file():
+def list_of_segment_objects_from_file():
     test_file_path = "docs/small-PCT-JP.docx"
     full_file_path = BASE_DIR + "/" + test_file_path
     segments = translate.get_source_segments(full_file_path)
@@ -113,7 +113,7 @@ def test_setup_deepl_auth_key_retrieval_from_env_file():
     assert env("KEY") == expected
 
 
-def test_get_source_segments(segment_objects_from_file):
+def test_get_source_segments(list_of_segment_objects_from_file):
     expected = [
         "明細書",
         "発明の名称 : 情報処理装置、情報処理方法及びプログラム",
@@ -141,12 +141,12 @@ def test_get_source_segments(segment_objects_from_file):
         "なお、表示部３は、非シースルータイプの表示部であってもよい。",
         "この場合、撮像部４により撮像された画像が表示部３上に表示される。",
     ]
-    output = [seg_obj.source_text for seg_obj in segment_objects_from_file]
+    output = [seg_obj.source_text for seg_obj in list_of_segment_objects_from_file]
     assert output == expected
 
 
-def test_get_source_char_count(segment_objects_from_file):
-    output = translate.get_source_char_count(segment_objects_from_file)
+def test_get_source_char_count(list_of_segment_objects_from_file):
+    output = translate.get_source_char_count(list_of_segment_objects_from_file)
     expected_char_count = 686
     assert output == expected_char_count
 
@@ -163,7 +163,7 @@ def test_check_deepl_usage_fail(mock_translator):
     assert output is False
 
 
-def test_translate_segments(mock_translator, segments_list):
-    segments = translate.translate_segments(mock_translator, segments_list, None)
+def test_translate_segments(mock_translator, list_of_segment_objects):
+    segments = translate.translate_segments(mock_translator, list_of_segment_objects, None)
     for segment in segments:
         assert segment.target_text == "mock_target_string"
