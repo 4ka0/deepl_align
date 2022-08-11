@@ -8,19 +8,6 @@ from .. import translate
 from .. translate import Segment
 
 
-def test_constructor():
-    '''
-    Test instantiation
-    '''
-    s = Segment('なお、正孔輸送層12は、NiO、（またはMoO3）等の無機材料を'
-                '含んでいてもよい。',
-                'moreover, the positive  hole transport layers 12 may '
-                'include an inorganic material such as NiO (or MoO3].',
-                '', '', [], [], False, {}, {}, False, False, False, False,
-                False, False, [], False, [], False, False, [])
-    assert isinstance(s, Segment)
-
-
 @pytest.mark.parametrize(
     'user_input,expected', [
         # Just translation file given.
@@ -43,6 +30,27 @@ def test_user_input_check(user_input, expected):
     assert translate.check_user_input(user_input) == expected
 
 
+@pytest.fixture
+def segment_object():
+    segment = Segment(
+        source_text="正孔輸送層12は、無機材料を含んでいてもよい。",
+        target_text="The positive hole transport layers 12 may include an inorganic material.",
+    )
+    return segment
+
+
+def test_segment_constructor(segment_object):
+    assert isinstance(segment_object, Segment)
+
+
+def test_segment_object_source_text(segment_object):
+    assert segment_object.source_text == "正孔輸送層12は、無機材料を含んでいてもよい。"
+
+
+def test_segment_object_target_text(segment_object):
+    assert segment_object.target_text == "The positive hole transport layers 12 may include an inorganic material."
+
+"""
 def test_get_source_segments():
 
     # Need to give Document the absolute path to the test docx file.
@@ -81,3 +89,4 @@ def test_get_source_segments():
     output = translate.get_source_segments(full_file_path)
 
     assert output == expected
+"""

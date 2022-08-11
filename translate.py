@@ -50,13 +50,20 @@ def check_user_input(user_input):
     return True, translation_file, glossary_file
 
 
+def setup_deepl_translator():
+    env = Env()
+    env.read_env()
+    auth_key = env.str("AUTH_KEY")
+    translator = deepl.Translator(auth_key)
+    return translator
+
+
 def get_source_segments(source_file):
     """
     Reads in text from user-specified docx file.
     File is already split into paragraphs by Document module.
     Text is further split into sentences if a paragraph contains multiple sentences.
     """
-
     document = Document(source_file)
     segments = []
 
@@ -81,23 +88,29 @@ def get_source_segments(source_file):
     return segments
 
 
-def translate_segments(segments, glossary_file):
+def get_source_text_char_count(source_segments):
+    source_strings = [segment.source_text for segment in source_segments]
+    char_count = sum(len(i) for i in source_strings)
+    return char_count
+
+
+def check_deepl_usage(source_char_count, translator):
+
+    print("\nNumber of chars in source text:")
+    print("Characters: " + str(source_char_count))
+
+    usage = translator.get_usage()
+    print("\n" + str(usage) + "\n")
+
+    return True
+
+
+def translate_segments(translator, segments, glossary_file):
     """
     Obtains translations for source_segments by calling the DeepL API.
     Returns list of Segment objects with the source_text and target_text
     attributes populated.
     """
-
-    # Get the DeepL auth key from env file
-    env = Env()
-    env.read_env()
-    auth_key = env.str("AUTH_KEY")
-
-    # Get translation from DeepL
-    translator = deepl.Translator(auth_key)
-
-    # Add in usage check here, if close to 500000 ...
-
     for segment in segments:
         target_text = translator.translate_text(
             segment.source_text,
@@ -105,9 +118,6 @@ def translate_segments(segments, glossary_file):
             target_lang="en-US",
         )
         segment.target_text = target_text
-
-    usage = translator.get_usage()
-    print("\n" + str(usage) + "\n")
 
     return segments
 
@@ -117,8 +127,11 @@ if __name__ == "__main__":
     valid, source_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
+        translator = setup_deepl_translator()
         source_segments = get_source_segments(source_file)
-        full_segments = translate_segments(source_segments, glossary_file)
+        source_char_count = get_source_text_char_count(source_segments)
+        if check_deepl_usage(source_char_count, translator):
+            full_segments = translate_segments(translator, source_segments, glossary_file)
 
         for segment in full_segments:
             print()
