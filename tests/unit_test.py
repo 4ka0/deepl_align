@@ -17,6 +17,22 @@ from environs import Env
 BASE_DIR = current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
+class Translator:
+    """
+    Used with the below mock_translator() fixture to mock a DeepL Translator object.
+    """
+    def __init__(self, usage):
+        self.usage = usage
+
+    def get_usage(self):
+        return self.usage
+
+
+@pytest.fixture
+def mock_translator():
+    return Translator(usage=300000)
+
+
 @pytest.mark.parametrize(
     'user_input,expected', [
         # Just translation file given.
@@ -116,5 +132,17 @@ def test_get_source_segments(segment_objects_from_file):
 
 def test_get_source_char_count(segment_objects_from_file):
     output = translate.get_source_char_count(segment_objects_from_file)
-    expected = 686
-    assert output == expected
+    expected_char_count = 686
+    assert output == expected_char_count
+
+
+def test_check_deepl_usage_pass(mock_translator):
+    source_char_count = 500
+    output = translate.check_deepl_usage(source_char_count, mock_translator)
+    assert output is True
+
+
+def test_check_deepl_usage_fail(mock_translator):
+    source_char_count = 200000
+    output = translate.check_deepl_usage(source_char_count, mock_translator)
+    assert output is False

@@ -95,13 +95,10 @@ def get_source_char_count(source_segments):
 
 
 def check_deepl_usage(source_char_count, translator):
-
-    print("\nNumber of chars in source text:")
-    print("Characters: " + str(source_char_count))
-
+    monthly_limit = 500000
     usage = translator.get_usage()
-    print("\n" + str(usage) + "\n")
-
+    if source_char_count + usage >= monthly_limit:
+        return False
     return True
 
 
