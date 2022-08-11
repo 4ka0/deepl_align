@@ -95,9 +95,14 @@ def get_source_char_count(source_segments):
 
 
 def check_deepl_usage(source_char_count, translator):
-    monthly_limit = 500000
+    """
+    The monthly limit for the free API is 500000.
+    This is set to 499900 to create a buffer of 100 character to allow for
+    potential differences in how characters are counted.
+    """
+    monthly_limit = 499900
     usage = translator.get_usage()
-    if source_char_count + usage >= monthly_limit:
+    if source_char_count + usage.character.count >= monthly_limit:
         return False
     return True
 

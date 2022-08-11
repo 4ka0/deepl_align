@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from unittest.mock import Mock
 
 from .. import translate
 from .. translate import Segment
@@ -19,10 +20,17 @@ BASE_DIR = current_dir = os.path.dirname(os.path.realpath(__file__))
 
 class Translator:
     """
-    Used with the below mock_translator() fixture to mock a DeepL Translator object.
+    Used with the below mock_translator() fixture to mock a DeepL Translator
+    object. In the __init__() method, Mock from unittest.mock is used to create
+    a mock version of the DeepL Usage class and thereby make it possible to
+    replicate the Character subtype of Usage and the "count" attribute of
+    Character within get_usage() below, thereby making it possible to replicate
+    "usage.character.count" which is used in check_deepl_usage() in
+    translate.py to check the current character count usage in check_deepl_usage().
     """
-    def __init__(self, usage):
-        self.usage = usage
+    def __init__(self):
+        self.usage = Mock()
+        self.usage.character.count = 300000
 
     def get_usage(self):
         return self.usage
@@ -33,7 +41,7 @@ class Translator:
 
 @pytest.fixture
 def mock_translator():
-    return Translator(usage=300000)
+    return Translator()
 
 
 @pytest.mark.parametrize(
@@ -81,7 +89,7 @@ def list_of_segment_objects():
 
 @pytest.fixture
 def list_of_segment_objects_from_file():
-    test_file_path = "docs/small-PCT-JP.docx"
+    test_file_path = "docs/test-source-text.docx"
     full_file_path = BASE_DIR + "/" + test_file_path
     segments = translate.get_source_segments(full_file_path)
     return segments
