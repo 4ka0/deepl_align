@@ -88,7 +88,7 @@ def get_source_segments(source_file):
     return segments
 
 
-def get_source_text_char_count(source_segments):
+def get_source_char_count(source_segments):
     source_strings = [segment.source_text for segment in source_segments]
     char_count = sum(len(i) for i in source_strings)
     return char_count
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     if valid:
         translator = setup_deepl_translator()
         source_segments = get_source_segments(source_file)
-        source_char_count = get_source_text_char_count(source_segments)
+        source_char_count = get_source_char_count(source_segments)
         if check_deepl_usage(source_char_count, translator):
             full_segments = translate_segments(translator, source_segments, glossary_file)
 
