@@ -5,6 +5,7 @@
 Explanatory docstring.
 """
 
+import os
 import sys
 import deepl
 from docx import Document
@@ -108,11 +109,27 @@ def check_deepl_usage(source_char_count, translator):
 
 
 def translate_segments(translator, segments, glossary_file):
-    """
-    Obtains translations for source_segments by calling the DeepL API.
-    Returns list of Segment objects with the source_text and target_text
-    attributes populated.
-    """
+
+    if glossary_file:
+
+        entries = extract_glossary_entries(glossary_file)
+
+        glossary = create_deepl_glossary(translator, glossary_file, entries)
+
+        if glossary:
+            for segment in segments:
+                target_text = translator.translate_text(
+                    segment.source_text,
+                    source_lang="JA",
+                    target_lang="en-US",
+                    glossary=glossary,
+                )
+                segment.target_text = target_text
+            return segments
+        else:
+            print("There was a problem with your glossary file.")
+            sys.exit()
+
     for segment in segments:
         target_text = translator.translate_text(
             segment.source_text,
@@ -122,6 +139,74 @@ def translate_segments(translator, segments, glossary_file):
         segment.target_text = target_text
 
     return segments
+
+
+def extract_glossary_entries(glossary_file):
+    """
+    Function to extract entries from user supplied glossary.
+    Exits the program if - there is an error when reading the glossary file.
+                         - the glossary file does not contain accepted entries.
+    """
+
+    entries = {}
+
+    try:
+        with open(glossary_file, encoding="utf-8") as f:
+            for line in f:
+                # Only add to entries if:
+                # - there are two entries on a line
+                # - both entries contain characters
+                # - both entries are not just whitespace
+                # Otherwise ignore the line.
+                line_entries = line.split("\t")
+                if len(line_entries) == 2:
+                    if line_entries[0] and line_entries[1]:
+                        if not line_entries[0].isspace() and not line_entries[1].isspace():
+                            entries[line_entries[0]] = line_entries[1]
+
+    except Exception as e:
+        print(
+            "An error occurred when reading your glossary file.\n"
+            "Error details:"
+        )
+        print(e)
+        sys.exit()
+
+    # Check the length of the entries dict. If zero, output error message and
+    # request user to check the formatting of the file content.
+    if len(entries) == 0:
+        print(
+            "Your glossary file did not contain any parsable entries.\n"
+            "Please check that the entries in the file are correctly "
+            "formatted as a tab-delimited text file."
+        )
+        sys.exit()
+
+    return entries
+
+
+def create_deepl_glossary(translator, glossary_file, entries):
+
+    # Create glossary name based on "glossary-file" filename
+    glossary_name = os.path.splitext(os.path.basename(glossary_file))[0]
+
+    # Upload dict to deepl
+    try:
+        deepl_glossary = translator.create_glossary(
+            glossary_name,
+            source_lang="JA",
+            target_lang="en-US",
+            entries=entries,
+        )
+    except Exception as e:
+        print(
+            "An error occurred when uploading your glossary to DeepL.\n"
+            "Error details:"
+        )
+        print(e)
+        sys.exit()
+
+    return deepl_glossary
 
 
 if __name__ == "__main__":
