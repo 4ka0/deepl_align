@@ -158,7 +158,7 @@ def test_get_source_char_count(list_of_segment_objects_from_file):
     assert output == expected_char_count
 
 
-def test_check_deepl_usage_pass(mock_translator):
+def test_check_deepl_usage_success(mock_translator):
     source_char_count = 500
     output = translate.check_deepl_usage(source_char_count, mock_translator)
     assert output is True
@@ -174,3 +174,24 @@ def test_translate_segments(mock_translator, list_of_segment_objects):
     segments = translate.translate_segments(mock_translator, list_of_segment_objects, None)
     for segment in segments:
         assert segment.target_text == "mock_target_string"
+
+
+def test_extract_glossary_entries_success():
+    expected = {
+        "明細書": "Description",
+        "発明の名称": "Title of the invention",
+        "情報処理装置": "information processing device",
+        "技術分野": "Technical Field",
+        "に関する": "relates to",
+        "近年": "in recent years",
+        "ＡＲ技術": "AR technology",
+        "特許文献": "Patent Documents",
+        "発明の概要": "Summary of the Invention",
+        "発明が解決しようとする課題": "Problem to be Solved by the Invention",
+        "表示部": "display unit",
+        "制御部": "control unit",
+    }
+    test_file_path = "docs/test-glossary.txt"
+    full_file_path = BASE_DIR + "/" + test_file_path
+    output = translate.extract_glossary_entries(full_file_path)
+    assert output == expected

@@ -164,8 +164,11 @@ def extract_glossary_entries(glossary_file):
                 line_entries = line.split("\t")
                 if len(line_entries) == 2:
                     if line_entries[0] and line_entries[1]:
-                        if not line_entries[0].isspace() and not line_entries[1].isspace():
-                            entries[line_entries[0]] = line_entries[1]
+                        # Remove leading and trailing whitespace chars and newline chars
+                        source = line_entries[0].strip()
+                        target = line_entries[1].strip()
+                        if not source.isspace() and not target.isspace():
+                            entries[source] = target
 
     except Exception as e:
         print(
