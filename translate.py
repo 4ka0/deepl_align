@@ -110,26 +110,29 @@ def check_deepl_usage(source_char_count, translator):
 
 def translate_segments(translator, segments, glossary_file):
 
+    # Get translations using glossary
     if glossary_file:
 
         entries = extract_glossary_entries(glossary_file)
 
         glossary = create_deepl_glossary(translator, glossary_file, entries)
 
-        if glossary:
-            for segment in segments:
-                target_text = translator.translate_text(
-                    segment.source_text,
-                    source_lang="JA",
-                    target_lang="en-US",
-                    glossary=glossary,
-                )
-                segment.target_text = target_text
-            return segments
-        else:
-            print("There was a problem with your glossary file.")
-            sys.exit()
+        # Get translations, one segment at a time
+        for segment in segments:
+            target_text = translator.translate_text(
+                segment.source_text,
+                source_lang="JA",
+                target_lang="en-US",
+                glossary=glossary,
+            )
+            segment.target_text = target_text
 
+        # Delete uploaded glossary from DeepL platform
+        translator.delete_glossary(glossary)
+
+        return segments
+
+    # Get translations without using glossary
     for segment in segments:
         target_text = translator.translate_text(
             segment.source_text,
