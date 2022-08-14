@@ -191,7 +191,34 @@ def test_extract_glossary_entries_success():
         "表示部": "display unit",
         "制御部": "control unit",
     }
-    test_file_path = "docs/test-glossary.txt"
+    test_file_path = "docs/test-glossary-1.txt"
     full_file_path = BASE_DIR + "/" + test_file_path
     output = translate.extract_glossary_entries(full_file_path)
     assert output == expected
+
+
+def test_extract_glossary_entries_fail_1():
+    # Test SystemExit is raised when attempting to read non-existent glossary file.
+    with pytest.raises(SystemExit):
+        test_file_path = "docs/test-glossary.txt"
+        full_file_path = BASE_DIR + "/" + test_file_path
+        translate.extract_glossary_entries(full_file_path)
+
+
+def test_extract_glossary_entries_fail_2():
+    # Test improperly formatted glossary lines are ignored
+    expected = {
+        "特許文献": "Patent Documents",
+    }
+    test_file_path = "docs/test-glossary-3.txt"
+    full_file_path = BASE_DIR + "/" + test_file_path
+    output = translate.extract_glossary_entries(full_file_path)
+    assert output == expected
+
+
+def test_extract_glossary_entries_fail_3():
+    # Test SystemExit is raised when nothing has been read from the user glossary file.
+    with pytest.raises(SystemExit):
+        test_file_path = "docs/test-glossary-4.txt"
+        full_file_path = BASE_DIR + "/" + test_file_path
+        translate.extract_glossary_entries(full_file_path)

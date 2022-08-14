@@ -1,0 +1,12 @@
+明細書	Description
+発明の名称	Title of the invention
+情報処理装置	information processing device
+技術分野	Technical Field
+に関する	relates to
+近年	in recent years
+ＡＲ技術	AR technology
+特許文献	Patent Documents
+発明の概要	Summary of the Invention
+発明が解決しようとする課題	Problem to be Solved by the Invention
+表示部	display unit
+制御部	control unit

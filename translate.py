@@ -156,18 +156,19 @@ def extract_glossary_entries(glossary_file):
     try:
         with open(glossary_file, encoding="utf-8") as f:
             for line in f:
+
                 # Only add to entries if:
                 # - there are two entries on a line
-                # - both entries contain characters
                 # - both entries are not just whitespace
+                # - both entries contain characters
                 # Otherwise ignore the line.
+
                 line_entries = line.split("\t")
                 if len(line_entries) == 2:
-                    if line_entries[0] and line_entries[1]:
-                        # Remove leading and trailing whitespace chars and newline chars
+                    if not line_entries[0].isspace() and not line_entries[1].isspace():
                         source = line_entries[0].strip()
                         target = line_entries[1].strip()
-                        if not source.isspace() and not target.isspace():
+                        if source and target:
                             entries[source] = target
 
     except Exception as e:
