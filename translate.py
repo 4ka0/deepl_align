@@ -115,7 +115,9 @@ def translate_segments(translator, segments, glossary_file):
 
         entries = extract_glossary_entries(glossary_file)
 
-        glossary = create_deepl_glossary(translator, glossary_file, entries)
+        glossary_name = build_glossary_name(glossary_file)
+
+        glossary = create_deepl_glossary(translator, glossary_name, entries)
 
         # Get translations, one segment at a time
         for segment in segments:
@@ -192,12 +194,17 @@ def extract_glossary_entries(glossary_file):
     return entries
 
 
-def create_deepl_glossary(translator, glossary_file, entries):
+def build_glossary_name(glossary_file):
+    """Create glossary name based on "glossary-file" filename"""
+    # Get the filename including the extension
+    basename = os.path.basename(glossary_file)
+    # Get just the filename without the extension
+    glossary_name = os.path.splitext(basename)[0]
+    return glossary_name
 
-    # Create glossary name based on "glossary-file" filename
-    glossary_name = os.path.splitext(os.path.basename(glossary_file))[0]
 
-    # Upload dict to deepl
+def create_deepl_glossary(translator, glossary_name, entries):
+    """Upload entries to DeepL platform and receive GlossaryInfo obj."""
     try:
         deepl_glossary = translator.create_glossary(
             glossary_name,
@@ -212,7 +219,6 @@ def create_deepl_glossary(translator, glossary_file, entries):
         )
         print(e)
         sys.exit()
-
     return deepl_glossary
 
 
