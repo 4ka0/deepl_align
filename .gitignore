@@ -3,9 +3,11 @@
 .coverage
 .env
 .venv/
+.docx
+.tmx
 __pycache__/
 media/
 htmlcov/
-.docx
 source_docs/
 document_translate.py
+
