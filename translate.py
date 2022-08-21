@@ -108,44 +108,6 @@ def check_deepl_usage(source_char_count, translator):
     return True
 
 
-def translate_segments(translator, segments, glossary_file):
-
-    # Get translations using glossary
-    if glossary_file:
-
-        entries = extract_glossary_entries(glossary_file)
-
-        glossary_name = build_glossary_name(glossary_file)
-
-        glossary = create_deepl_glossary(translator, glossary_name, entries)
-
-        # Get translations, one segment at a time
-        for segment in segments:
-            target_text = translator.translate_text(
-                segment.source_text,
-                source_lang="JA",
-                target_lang="en-US",
-                glossary=glossary,
-            )
-            segment.target_text = target_text
-
-        # Delete uploaded glossary from DeepL platform
-        translator.delete_glossary(glossary)
-
-        return segments
-
-    # Get translations without using glossary
-    for segment in segments:
-        target_text = translator.translate_text(
-            segment.source_text,
-            source_lang="JA",
-            target_lang="en-US",
-        )
-        segment.target_text = target_text
-
-    return segments
-
-
 def extract_glossary_entries(glossary_file):
     """
     Function to extract entries from user supplied glossary.
@@ -195,7 +157,7 @@ def extract_glossary_entries(glossary_file):
 
 
 def build_glossary_name(glossary_file):
-    """Create glossary name based on "glossary-file" filename"""
+    """Create glossary name based on "glossary-file" filename."""
     # Get the filename including the extension
     basename = os.path.basename(glossary_file)
     # Get just the filename without the extension
@@ -204,7 +166,10 @@ def build_glossary_name(glossary_file):
 
 
 def create_deepl_glossary(translator, glossary_name, entries):
-    """Upload entries to DeepL platform and receive GlossaryInfo obj."""
+    """
+    Upload entries to DeepL platform.
+    Returns GlossaryInfo object.
+    """
     try:
         deepl_glossary = translator.create_glossary(
             glossary_name,
@@ -222,19 +187,66 @@ def create_deepl_glossary(translator, glossary_name, entries):
     return deepl_glossary
 
 
+def translate_segments(translator, segments, glossary):
+    # Perform translation using glossary
+    if glossary:
+
+        # Get translation for each segment, one segment at a time
+        for segment in segments:
+            target_text = translator.translate_text(
+                segment.source_text,
+                source_lang="JA",
+                target_lang="en-US",
+                glossary=glossary,
+            )
+            segment.target_text = target_text
+
+        # Delete glossary from DeepL platform
+        translator.delete_glossary(glossary)
+
+        return segments
+
+    # Perform translation without using glossary
+    for segment in segments:
+        target_text = translator.translate_text(
+            segment.source_text,
+            source_lang="JA",
+            target_lang="en-US",
+        )
+        segment.target_text = target_text
+
+    return segments
+
+
 if __name__ == "__main__":
 
     valid, source_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
+
         translator = setup_deepl_translator()
         source_segments = get_source_segments(source_file)
         source_char_count = get_source_char_count(source_segments)
 
         if check_deepl_usage(source_char_count, translator):
-            full_segments = translate_segments(translator, source_segments, glossary_file)
 
-        for segment in full_segments:
+            if glossary_file:
+                glossary_entries = extract_glossary_entries(glossary_file)
+                glossary_name = build_glossary_name(glossary_file)
+                glossary = create_deepl_glossary(translator, glossary_name, glossary_entries)
+                translated_segments = translate_segments(translator, source_segments, glossary)
+            else:
+                translated_segments = translate_segments(translator, source_segments, None)
+
+        else:
+            print(
+                "The monthly limit has been reached."
+                "Please try again next month."
+            )
+            sys.exit()
+
+        # Test print
+        for segment in translated_segments:
             print()
             print(segment.source_text)
             print(segment.target_text)
