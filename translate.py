@@ -18,19 +18,19 @@ def check_user_input(user_input):
 
     format_message = (
         "Expected input: python3 translate.py translation.docx glossary.txt\n"
-        "(glossary.txt is optional.)\n"
+        "(glossary.txt is optional.)"
     )
 
     # Should be 2 or 3 args
     if len(user_input) < 2 or len(user_input) > 3:
-        print("\nError: Incorrect number of arguments.")
+        print("Error: Incorrect number of arguments.")
         print(format_message)
         return False, None, None
 
     # 2nd arg should be a docx file
     translation_file = user_input[1]
     if not translation_file.lower().endswith('.docx'):
-        print("\nError: Second argument should be a docx file.")
+        print("Error: Second argument should be a docx file.")
         print(format_message)
         return False, None, None
 
@@ -38,7 +38,7 @@ def check_user_input(user_input):
     if len(user_input) == 3:
         glossary_file = user_input[2]
         if not glossary_file.lower().endswith('.txt'):
-            print("\nError: Third argument should be a txt file.")
+            print("Error: Third argument should be a txt file.")
             print(format_message)
             return False, None, None
     else:
@@ -236,7 +236,7 @@ def create_tmx(translated_segments):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<!DOCTYPE tmx SYSTEM "tmx11.dtd">\n'
             '<tmx version="1.1">\n'
-            '  <header creationtool="kikai-to-tmx" adminlang="EN-US" datatype="plaintext" '
+            '  <header creationtool="DeepL-to-tmx" adminlang="EN-US" datatype="plaintext" '
             'segtype="sentence" srclang="JA"/>\n'
             '  <body>\n'
         )
