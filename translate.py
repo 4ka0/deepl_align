@@ -263,10 +263,6 @@ def create_tmx(translated_segments):
         print("TMX file created.")
 
 
-def create_docx(translated_segments):
-    pass
-
-
 def output_deepl_usage(translator):
     usage = translator.get_usage()
     print(
@@ -307,6 +303,4 @@ if __name__ == "__main__":
             sys.exit()
 
         create_tmx(translated_segments)
-        create_docx(translated_segments)
-
         output_deepl_usage(translator)
