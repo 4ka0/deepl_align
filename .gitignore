@@ -4,10 +4,9 @@
 .env
 .venv/
 .docx
-.tmx
 __pycache__/
 media/
 htmlcov/
 source_docs/
 document_translate.py
-
+output.tmx
