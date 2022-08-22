@@ -61,7 +61,8 @@ def get_source_segments(source_file):
     """
     Reads in text from user-specified docx file.
     File is already split into paragraphs by Document module.
-    Text is further split into sentences if a paragraph contains multiple sentences.
+    Text is further split into sentences if a paragraph contains multiple
+    sentences.
     """
 
     print("Reading text from source docx file.")
@@ -77,9 +78,10 @@ def get_source_segments(source_file):
 
             for sentence in sentences:
                 # Add each single sentence to source_segments list.
-                # However, if "。" appears at the end of a string, split() creates an empty string
-                # representing the substring that follows "。". Using "if sentence" skips such
-                # empty strings. Also, split() removes the "。" delim, so have to add this back on.
+                # However, if "。" appears at the end of a string, split()
+                # creates an empty string representing the substring that
+                # follows "。". Using "if sentence" skips such empty strings.
+                # Also, split() removes the "。" delim, so have to add this.
                 if sentence:
                     segment = Segment(source_text=sentence + "。", target_text="")
                     segments.append(segment)
@@ -107,10 +109,10 @@ def check_deepl_usage(source_char_count, translator):
 
     monthly_limit = 499900
     usage = translator.get_usage()
-    
+
     if source_char_count + usage.character.count >= monthly_limit:
         return False
-    
+
     print("Sufficient usage remaining.")
     return True
 
@@ -165,13 +167,15 @@ def extract_glossary_entries(glossary_file):
     return entries
 
 
-def build_glossary_name(glossary_file):
-    """Create glossary name based on "glossary-file" filename."""
-    # Get the filename including the extension
-    basename = os.path.basename(glossary_file)
-    # Get just the filename without the extension
-    glossary_name = os.path.splitext(basename)[0]
-    return glossary_name
+def get_filename(whole_file_path):
+    """
+    Used to get the name of a given file, which is then used to build a name
+    for other such as the glossary file created on the DeepL platform and the
+    tmx file that is ultimately output.
+    """
+    filename_plus_extension = os.path.basename(whole_file_path)
+    filename = os.path.splitext(filename_plus_extension)[0]
+    return filename
 
 
 def create_deepl_glossary(translator, glossary_name, entries):
@@ -196,6 +200,7 @@ def create_deepl_glossary(translator, glossary_name, entries):
         )
         print(e)
         sys.exit()
+
     return deepl_glossary
 
 
@@ -233,8 +238,11 @@ def translate_segments(translator, segments, glossary):
     return segments
 
 
-def create_tmx(translated_segments):
-    with open('output.tmx', 'w') as f:
+def create_tmx(tmx_name, translated_segments):
+
+    tmx_filename = tmx_name + ".tmx"
+
+    with open(tmx_filename, 'w') as f:
 
         # Write the start of the tmx file
         f.write(
@@ -291,7 +299,7 @@ if __name__ == "__main__":
 
             if glossary_file:
                 glossary_entries = extract_glossary_entries(glossary_file)
-                glossary_name = build_glossary_name(glossary_file)
+                glossary_name = get_filename(glossary_file)
                 glossary = create_deepl_glossary(translator, glossary_name, glossary_entries)
                 translated_segments = translate_segments(translator, source_segments, glossary)
             else:
@@ -305,5 +313,6 @@ if __name__ == "__main__":
             )
             sys.exit()
 
-        create_tmx(translated_segments)
+        tmx_name = get_filename(source_file)
+        create_tmx(tmx_name, translated_segments)
         output_deepl_usage(translator)
