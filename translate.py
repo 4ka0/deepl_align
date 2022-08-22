@@ -3,9 +3,11 @@
 
 import os
 import sys
+
+# Third party packages
 import deepl
-from docx import Document
 from environs import Env
+from docx import Document
 
 
 class Segment():
