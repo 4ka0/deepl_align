@@ -107,8 +107,11 @@ def check_deepl_usage(source_char_count, translator):
 
     monthly_limit = 499900
     usage = translator.get_usage()
+    
     if source_char_count + usage.character.count >= monthly_limit:
         return False
+    
+    print("Sufficient usage remaining.")
     return True
 
 
@@ -285,8 +288,6 @@ if __name__ == "__main__":
         source_char_count = get_source_char_count(source_segments)
 
         if check_deepl_usage(source_char_count, translator):
-
-            print("Sufficient usage remaining.")
 
             if glossary_file:
                 glossary_entries = extract_glossary_entries(glossary_file)
