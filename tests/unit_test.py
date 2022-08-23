@@ -18,16 +18,37 @@ from environs import Env
 BASE_DIR = current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-class Translator:
-    """
-    Used with the below mock_translator() fixture to mock a DeepL Translator
-    object. In the __init__() method, Mock from unittest.mock is used to create
-    a mock version of the DeepL Usage class and thereby make it possible to
-    replicate the Character subtype of Usage and the "count" attribute of
-    Character within get_usage() below, thereby making it possible to replicate
-    "usage.character.count" which is used in check_deepl_usage() in
-    translate.py to check the current character count usage in check_deepl_usage().
-    """
+class MockDeeplGlossary():
+    def __init__(self, glossary_name, source_lang, target_lang, entries):
+        self.usage = Mock()
+        self.glossary_name = glossary_name
+        self.source_lang = source_lang
+        self.target_lang = target_lang
+        self.entries = entries
+
+    @property
+    def name(self):
+        return self.glossary_name
+
+    @property
+    def source_lang(self):
+        return self.source_lang
+
+    @property
+    def target_lang(self):
+        return self.target_lang
+
+    @property
+    def entry_count(self):
+        return self.entries
+
+
+@pytest.fixture
+def mock_deepl_glossary():
+    return MockDeeplGlossary()
+
+
+class MockDeeplTranslator:
     def __init__(self):
         self.usage = Mock()
         self.usage.character.count = 300000
@@ -38,32 +59,37 @@ class Translator:
     def translate_text(self, source_text, source_lang, target_lang):
         return "mock_target_string"
 
+    def create_glossary(self, glossary_name, source_lang, target_lang, entries):
+        return MockDeeplGlossary(glossary_name, source_lang, target_lang, entries)
+
 
 @pytest.fixture
-def mock_translator():
-    return Translator()
+def mock_deepl_translator():
+    return MockDeeplTranslator()
 
 
-@pytest.mark.parametrize(
-    'user_input,expected', [
-        # Just translation file given.
-        (['translate.py', 'source.docx'], (True, 'source.docx', None)),
-        # Translation file and glossary file given.
-        (['translate.py', 'source.docx', 'glossary.txt'], (True, 'source.docx', 'glossary.txt')),
-        # No files given.
-        (['translate.py'], (False, None, None)),
-        # Too many args.
-        (['translate.py', 'source.docx', 'glossary.txt', 'random.pdf'], (False, None, None)),
-        # Incorrect translation file type.
-        (['translate.py', 'source.doc'], (False, None, None)),
-        # Incorrect glossary file type.
-        (['translate.py', 'source.docx', 'glossary.docx'], (False, None, None)),
-        # Just glossary file given.
-        (['translate.py', 'glossary.txt'], (False, None, None)),
-    ]
-)
-def test_user_input_check(user_input, expected):
-    assert translate.check_user_input(user_input) == expected
+@pytest.fixture
+def mock_glossary_file():
+    return "coding/python/kikai_to_tmx/tests/docs/test-glossary-file.docx"
+
+
+@pytest.fixture
+def mock_glossary_entries():
+    entries = {
+        "明細書": "Description",
+        "発明の名称": "Title of the invention",
+        "情報処理装置": "information processing device",
+        "技術分野": "Technical Field",
+        "に関する": "relates to",
+        "近年": "in recent years",
+        "ＡＲ技術": "AR technology",
+        "特許文献": "Patent Documents",
+        "発明の概要": "Summary of the Invention",
+        "発明が解決しようとする課題": "Problem to be Solved by the Invention",
+        "表示部": "display unit",
+        "制御部": "control unit",
+    }
+    return entries
 
 
 @pytest.fixture
@@ -97,6 +123,28 @@ def list_of_segment_objects_from_file():
 
 def test_segment_constructor(segment_object):
     assert isinstance(segment_object, Segment)
+
+
+@pytest.mark.parametrize(
+    'user_input,expected', [
+        # Just translation file given.
+        (['translate.py', 'source.docx'], (True, 'source.docx', None)),
+        # Translation file and glossary file given.
+        (['translate.py', 'source.docx', 'glossary.txt'], (True, 'source.docx', 'glossary.txt')),
+        # No files given.
+        (['translate.py'], (False, None, None)),
+        # Too many args.
+        (['translate.py', 'source.docx', 'glossary.txt', 'random.pdf'], (False, None, None)),
+        # Incorrect translation file type.
+        (['translate.py', 'source.doc'], (False, None, None)),
+        # Incorrect glossary file type.
+        (['translate.py', 'source.docx', 'glossary.docx'], (False, None, None)),
+        # Just glossary file given.
+        (['translate.py', 'glossary.txt'], (False, None, None)),
+    ]
+)
+def test_user_input_check(user_input, expected):
+    assert translate.check_user_input(user_input) == expected
 
 
 def test_segment_object_source_text(segment_object):
@@ -158,20 +206,20 @@ def test_get_source_char_count(list_of_segment_objects_from_file):
     assert output == expected_char_count
 
 
-def test_check_deepl_usage_success(mock_translator):
+def test_check_deepl_usage_success(mock_deepl_translator):
     source_char_count = 500
-    output = translate.check_deepl_usage(source_char_count, mock_translator)
+    output = translate.check_deepl_usage(source_char_count, mock_deepl_translator)
     assert output is True
 
 
-def test_check_deepl_usage_fail(mock_translator):
+def test_check_deepl_usage_fail(mock_deepl_translator):
     source_char_count = 200000
-    output = translate.check_deepl_usage(source_char_count, mock_translator)
+    output = translate.check_deepl_usage(source_char_count, mock_deepl_translator)
     assert output is False
 
 
-def test_translate_segments(mock_translator, list_of_segment_objects):
-    segments = translate.translate_segments(mock_translator, list_of_segment_objects, None)
+def test_translate_segments(mock_deepl_translator, list_of_segment_objects):
+    segments = translate.translate_segments(mock_deepl_translator, list_of_segment_objects, None)
     for segment in segments:
         assert segment.target_text == "mock_target_string"
 
@@ -207,9 +255,7 @@ def test_extract_glossary_entries_fail_1():
 
 def test_extract_glossary_entries_fail_2():
     # Test improperly formatted glossary lines are ignored
-    expected = {
-        "特許文献": "Patent Documents",
-    }
+    expected = {"特許文献": "Patent Documents"}
     test_file_path = "docs/test-glossary-3.txt"
     full_file_path = BASE_DIR + "/" + test_file_path
     output = translate.extract_glossary_entries(full_file_path)
@@ -222,3 +268,15 @@ def test_extract_glossary_entries_fail_3():
         test_file_path = "docs/test-glossary-4.txt"
         full_file_path = BASE_DIR + "/" + test_file_path
         translate.extract_glossary_entries(full_file_path)
+
+
+def test_create_deepl_glossary_success():
+    pass
+
+
+def test_build_glossary_name():
+    pass
+
+
+def test_output_deepl_usage():
+    pass
