@@ -15,7 +15,7 @@ from environs import Env
 # Need to use absolute paths in some of the below tests. Specifically,
 # those tests using Document and Env. Therefore need the full path to this
 # 'unit_test.py' file to build those absolute paths.
-BASE_DIR = current_dir = os.path.dirname(os.path.realpath(__file__))
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class MockDeeplGlossary():
@@ -109,6 +109,18 @@ def list_of_segment_objects():
         segment = Segment(
             source_text="正孔輸送層12は、無機材料を含む。",
             target_text="",
+        )
+        segments.append(segment)
+    return segments
+
+
+@pytest.fixture
+def list_of_translated_segment_objects():
+    segments = []
+    for i in range(10):
+        segment = Segment(
+            source_text="正孔輸送層12",
+            target_text="positive hole transport layers 12",
         )
         segments.append(segment)
     return segments
@@ -307,7 +319,23 @@ def test_translate_segments_with_glossary(mock_deepl_translator, mock_glossary_e
         assert segment.target_text == "mock_target_string_with_glossary"
 
 
-def test_create_tmx():
+def test_create_tmx_file_exists(list_of_translated_segment_objects):
+    parent_dir = os.path.join(BASE_DIR, os.pardir)
+    tmx_file_path = os.path.join(parent_dir, "test-tmx-file.tmx")
+
+    tmx_name = "test-tmx-file"
+    translate.create_tmx(tmx_name, list_of_translated_segment_objects)
+
+    assert os.path.exists(tmx_file_path) is True
+
+    # os.remove(tmx_file_path)
+
+    # assert os.path.exists(tmx_file_path) is False
+
+
+def test_create_tmx_file_content(list_of_translated_segment_objects):
+    # see content of "test-tmx-file.tmx" currently in folder
+    # then remove has marks from above test function
     pass
 
 
