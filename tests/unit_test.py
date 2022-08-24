@@ -52,11 +52,16 @@ class MockDeeplTranslator:
     def get_usage(self):
         return self.usage
 
-    def translate_text(self, source_text, source_lang, target_lang):
-        return "mock_target_string"
+    def translate_text(self, source_text, source_lang, target_lang, glossary):
+        if glossary:
+            return "mock_target_string_with_glossary"
+        return "mock_target_string_without_glossary"
 
     def create_glossary(self, glossary_name, source_lang, target_lang, entries):
         return MockDeeplGlossary(glossary_name, source_lang, target_lang, entries)
+
+    def delete_glossary(self, glossary):
+        pass
 
 
 @pytest.fixture
@@ -284,11 +289,22 @@ def test_create_deepl_glossary_success(mock_deepl_translator, mock_glossary_entr
 def test_translate_segments_without_glossary(mock_deepl_translator, list_of_segment_objects):
     segments = translate.translate_segments(mock_deepl_translator, list_of_segment_objects, None)
     for segment in segments:
-        assert segment.target_text == "mock_target_string"
+        assert segment.target_text == "mock_target_string_without_glossary"
 
 
-def test_translate_segments_with_glossary():
-    pass
+def test_translate_segments_with_glossary(mock_deepl_translator, mock_glossary_entries, list_of_segment_objects):
+
+    mock_deepl_glossary = MockDeeplGlossary(
+        glossary_name="Test glossary",
+        source_lang="JA",
+        target_lang="en-US",
+        entries=mock_glossary_entries,
+    )
+
+    segments = translate.translate_segments(mock_deepl_translator, list_of_segment_objects, mock_deepl_glossary)
+
+    for segment in segments:
+        assert segment.target_text == "mock_target_string_with_glossary"
 
 
 def test_create_tmx():
