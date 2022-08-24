@@ -175,21 +175,12 @@ def create_deepl_glossary(translator, glossary_name, entries):
     Upload entries to DeepL platform.
     Returns GlossaryInfo object.
     """
-
-    try:
-        deepl_glossary = translator.create_glossary(
-            glossary_name,
-            source_lang="JA",
-            target_lang="en-US",
-            entries=entries,
-        )
-    except Exception as e:
-        print(
-            "An error occurred when uploading your glossary to DeepL.\n"
-            "Error details:"
-        )
-        print(e)
-        sys.exit()
+    deepl_glossary = translator.create_glossary(
+        glossary_name,
+        source_lang="JA",
+        target_lang="en-US",
+        entries=entries,
+    )
 
     return deepl_glossary
 
