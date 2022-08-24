@@ -65,8 +65,6 @@ def get_source_segments(source_file):
     sentences.
     """
 
-    print("Reading text from source docx file.")
-
     document = Document(source_file)
     segments = []
 
@@ -104,16 +102,12 @@ def check_deepl_usage(source_char_count, translator):
     This is set to 499900 to create a buffer of 100 character to allow for
     potential differences in how characters are counted.
     """
-
-    print("Checking current DeepL usage.")
-
     monthly_limit = 499900
     usage = translator.get_usage()
 
     if source_char_count + usage.character.count >= monthly_limit:
         return False
 
-    print("Sufficient usage remaining.")
     return True
 
 
@@ -123,8 +117,6 @@ def extract_glossary_entries(glossary_file):
     Exits the program if - there is an error when reading the glossary file.
                          - the glossary file does not contain accepted entries.
     """
-
-    print("Reading glossary.")
 
     entries = {}
 
@@ -184,8 +176,6 @@ def create_deepl_glossary(translator, glossary_name, entries):
     Returns GlossaryInfo object.
     """
 
-    print("Uploading glossary to DeepL.")
-
     try:
         deepl_glossary = translator.create_glossary(
             glossary_name,
@@ -205,8 +195,6 @@ def create_deepl_glossary(translator, glossary_name, entries):
 
 
 def translate_segments(translator, segments, glossary):
-
-    print("Fetching translations from DeepL (may take a while).")
 
     # Perform translation using glossary
     if glossary:
@@ -279,7 +267,7 @@ def create_tmx(tmx_name, translated_segments):
 def output_deepl_usage(translator):
     usage = translator.get_usage()
     print(
-        "Current DeepL usage for this month: " +
+        "Remaining DeepL usage for this month: " +
         str(usage.character.count) +
         " (monthly limit: 500000)"
     )
