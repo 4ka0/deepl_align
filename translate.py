@@ -211,6 +211,7 @@ def translate_segments(translator, segments, glossary):
             segment.source_text,
             source_lang="JA",
             target_lang="en-US",
+            glossary=None,
         )
         segment.target_text = target_text
 
