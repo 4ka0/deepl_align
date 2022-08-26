@@ -9,4 +9,4 @@ media/
 htmlcov/
 source_docs/
 document_translate.py
-output.tmx
+.tmx
