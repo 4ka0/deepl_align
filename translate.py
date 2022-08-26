@@ -259,7 +259,7 @@ def create_tmx(tmx_name, translated_segments):
 
 def output_deepl_usage(translator):
     usage = translator.get_usage()
-    print(
+    return (
         "Current DeepL usage for this month: " +
         str(usage.character.count) +
         " (monthly limit: 500000)"
@@ -296,4 +296,4 @@ if __name__ == "__main__":
 
         tmx_name = get_filename(source_file)
         create_tmx(tmx_name, translated_segments)
-        output_deepl_usage(translator)
+        print(output_deepl_usage(translator))
