@@ -221,8 +221,9 @@ def translate_segments(translator, segments, glossary):
 def create_tmx(tmx_name, translated_segments):
 
     tmx_filename = tmx_name + ".tmx"
+    tmx_path = "output/" + tmx_filename
 
-    with open(tmx_filename, 'w') as f:
+    with open(tmx_path, 'w') as f:
 
         # Write the start of the tmx file
         f.write(

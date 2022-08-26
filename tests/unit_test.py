@@ -322,7 +322,7 @@ def test_translate_segments_with_glossary(mock_deepl_translator, mock_glossary_e
 def test_create_tmx_file_exists(list_of_translated_segment_objects):
 
     parent_dir = os.path.join(BASE_DIR, os.pardir)
-    tmx_file_path = os.path.join(parent_dir, "test-tmx-file.tmx")
+    tmx_file_path = os.path.join(parent_dir, "output/test-tmx-file.tmx")
 
     tmx_name = "test-tmx-file"
     translate.create_tmx(tmx_name, list_of_translated_segment_objects)
@@ -330,7 +330,11 @@ def test_create_tmx_file_exists(list_of_translated_segment_objects):
     assert os.path.exists(tmx_file_path) is True
 
     # Clean up after test
-    os.remove(tmx_file_path)
+    try:
+        os.remove(tmx_file_path)
+    except OSError:
+        pass
+
     assert os.path.exists(tmx_file_path) is False
 
 
@@ -343,7 +347,8 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<!DOCTYPE tmx SYSTEM "tmx11.dtd">',
         '<tmx version="1.1">',
-        '<header creationtool="DeepL-to-tmx" adminlang="EN-US" datatype="plaintext" segtype="sentence" srclang="JA"/>',
+        '<header creationtool="DeepL-to-tmx" adminlang="EN-US" '
+        'datatype="plaintext" segtype="sentence" srclang="JA"/>',
         '<body>',
         '<tu>',
         '<tuv lang="JA">',
@@ -430,7 +435,7 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
         '',
     ]
 
-    with open("test-tmx-file.tmx", "r") as f:
+    with open("output/test-tmx-file.tmx", "r") as f:
         raw_content = f.readlines()
         cleaned_content = [line.rstrip('\n').strip() for line in raw_content]
 
@@ -438,8 +443,13 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
 
     # Clean up after test
     parent_dir = os.path.join(BASE_DIR, os.pardir)
-    tmx_file_path = os.path.join(parent_dir, "test-tmx-file.tmx")
-    os.remove(tmx_file_path)
+    tmx_file_path = os.path.join(parent_dir, "output/test-tmx-file.tmx")
+
+    try:
+        os.remove(tmx_file_path)
+    except OSError:
+        pass
+
     assert os.path.exists(tmx_file_path) is False
 
 
