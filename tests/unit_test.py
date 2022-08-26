@@ -454,7 +454,13 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
 
 
 def test_get_filename():
-    pass
+    paths = [
+        "source_text.docx",
+        "source_dir/source_text.docx",
+        "top_dir/source_dir/source_text.docx",
+    ]
+    filenames = [translate.get_filename(path) for path in paths]
+    assert all(x == "source_text" for x in filenames)
 
 
 def test_output_deepl_usage():
