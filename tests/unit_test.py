@@ -334,7 +334,6 @@ def test_create_tmx_file_exists(list_of_translated_segment_objects):
         os.remove(tmx_file_path)
     except OSError:
         pass
-
     assert os.path.exists(tmx_file_path) is False
 
 
@@ -444,12 +443,10 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
     # Clean up after test
     parent_dir = os.path.join(BASE_DIR, os.pardir)
     tmx_file_path = os.path.join(parent_dir, "output/test-tmx-file.tmx")
-
     try:
         os.remove(tmx_file_path)
     except OSError:
         pass
-
     assert os.path.exists(tmx_file_path) is False
 
 
