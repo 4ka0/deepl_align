@@ -334,6 +334,7 @@ def test_create_tmx_file_exists(list_of_translated_segment_objects):
         os.remove(tmx_file_path)
     except OSError:
         pass
+
     assert os.path.exists(tmx_file_path) is False
 
 
@@ -460,5 +461,9 @@ def test_get_filename():
     assert all(x == "source_text" for x in filenames)
 
 
-def test_output_deepl_usage():
-    pass
+def test_output_deepl_usage(mock_deepl_translator):
+    output = translate.output_deepl_usage(mock_deepl_translator)
+    expected = (
+        "Current DeepL usage for this month: 300000 (monthly limit: 500000)"
+    )
+    assert output == expected
