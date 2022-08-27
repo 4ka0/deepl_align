@@ -207,13 +207,16 @@ def translate_segments(translator, segments, glossary):
 
         # Get translation for each segment, one segment at a time
         for segment in segments:
-            target_text = translator.translate_text(
-                segment.source_text,
-                source_lang="JA",
-                target_lang="en-US",
-                glossary=glossary,
-            )
-            segment.target_text = target_text
+            if segment.source_text:
+                target_text = translator.translate_text(
+                    segment.source_text,
+                    source_lang="JA",
+                    target_lang="en-US",
+                    glossary=glossary,
+                )
+                segment.target_text = target_text
+            else:
+                segment.target_text = ""
 
         # Delete glossary from DeepL platform
         translator.delete_glossary(glossary)
@@ -222,13 +225,16 @@ def translate_segments(translator, segments, glossary):
 
     # Perform translation without using glossary
     for segment in segments:
-        target_text = translator.translate_text(
-            segment.source_text,
-            source_lang="JA",
-            target_lang="en-US",
-            glossary=None,
-        )
-        segment.target_text = target_text
+        if segment.source_text:
+            target_text = translator.translate_text(
+                segment.source_text,
+                source_lang="JA",
+                target_lang="en-US",
+                glossary=None,
+            )
+            segment.target_text = target_text
+        else:
+            segment.target_text = ""
 
     return segments
 
