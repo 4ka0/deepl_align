@@ -20,7 +20,7 @@ def check_user_input(user_input):
 
     format_message = (
         "Expected input: python3 translate.py tmx/docx translation.docx glossary.txt\n"
-        "(glossary.txt is optional.)"
+        "(The glossary file is optional.)"
     )
 
     # Should be 3 or 4 args
@@ -72,6 +72,8 @@ def get_source_segments(source_file):
     sentences.
     """
 
+    print("Extracting text from \"" + source_file + "\".")
+
     document = Document(source_file)
     segments = []
 
@@ -100,6 +102,7 @@ def get_source_segments(source_file):
 def get_source_char_count(source_segments):
     source_strings = [segment.source_text for segment in source_segments]
     char_count = sum(len(i) for i in source_strings)
+    print("Characters extracted: " + str(char_count))
     return char_count
 
 
@@ -109,6 +112,7 @@ def check_deepl_usage(source_char_count, translator):
     This is set to 499900 to create a buffer of 100 character to allow for
     potential differences in how characters are counted.
     """
+
     monthly_limit = 499900
     usage = translator.get_usage()
 
@@ -124,6 +128,8 @@ def extract_glossary_entries(glossary_file):
     Exits the program if - there is an error when reading the glossary file.
                          - the glossary file does not contain accepted entries.
     """
+
+    print("Reading glossary.")
 
     entries = {}
 
@@ -194,6 +200,8 @@ def create_deepl_glossary(translator, glossary_name, entries):
 
 def translate_segments(translator, segments, glossary):
 
+    print("Translating text (this may take a little while).")
+
     # Perform translation using glossary
     if glossary:
 
@@ -223,6 +231,24 @@ def translate_segments(translator, segments, glossary):
         segment.target_text = target_text
 
     return segments
+
+
+def create_docx(docx_name, translated_segments):
+
+    docx_filename = docx_name + ".docx"
+    docx_path = "output/" + docx_filename
+
+    document = Document()
+    table = document.add_table(rows=1, cols=2)
+    table.style = "Table Grid"
+
+    for segment in translated_segments:
+        row_cells = table.add_row().cells
+        row_cells[0].text = str(segment.source_text)
+        row_cells[1].text = str(segment.target_text)
+
+    document.save(docx_path)
+    print("DOCX file created in \"" + docx_path + "\".")
 
 
 def create_tmx(tmx_name, translated_segments):
@@ -261,7 +287,7 @@ def create_tmx(tmx_name, translated_segments):
             '</tmx>\n\n'
         )
 
-        print("TMX file created.")
+        print("TMX file created in \"" + tmx_path + "\".")
 
 
 def output_deepl_usage(translator):
@@ -301,6 +327,11 @@ if __name__ == "__main__":
             )
             sys.exit()
 
-        tmx_name = get_filename(source_file)
-        create_tmx(tmx_name, translated_segments)
+        file_name = get_filename(source_file)
+
+        if output_format == "docx":
+            create_docx(file_name, translated_segments)
+        else:
+            create_tmx(file_name, translated_segments)
+
         print(output_deepl_usage(translator))
