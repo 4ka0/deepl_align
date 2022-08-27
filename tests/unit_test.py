@@ -138,22 +138,49 @@ def test_segment_constructor(segment_object):
     assert isinstance(segment_object, Segment)
 
 
+# input = translate.py tmx/docx translation.docx glossary.txt
+# output = valid, output_format, source_file, glossary_file
+
 @pytest.mark.parametrize(
     'user_input,expected', [
-        # Just translation file given.
-        (['translate.py', 'source.docx'], (True, 'source.docx', None)),
-        # Translation file and glossary file given.
-        (['translate.py', 'source.docx', 'glossary.txt'], (True, 'source.docx', 'glossary.txt')),
-        # No files given.
-        (['translate.py'], (False, None, None)),
+
+        # Success cases
+
+        # Just translation file given and docx format.
+        (['translate.py', 'docx', 'source.docx'], (True, 'docx', 'source.docx', None)),
+        # Just translation file given and tmx format.
+        (['translate.py', 'tmx', 'source.docx'], (True, 'tmx', 'source.docx', None)),
+        # Translation file, docx format, and glossary file given.
+        (['translate.py', 'docx', 'source.docx', 'glossary.txt'], (True, 'docx', 'source.docx', 'glossary.txt')),
+        # Translation file, tmx format, and glossary file given.
+        (['translate.py', 'tmx', 'source.docx', 'glossary.txt'], (True, 'tmx', 'source.docx', 'glossary.txt')),
+
+        # Failure cases
+
+        # No format or files given.
+        (['translate.py'], (False, None, None, None)),
+        # No files given and docx format.
+        (['translate.py', 'docx'], (False, None, None, None)),
+        # No files given and tmx format.
+        (['translate.py', 'tmx'], (False, None, None, None)),
+        # File but no format.
+        (['translate.py', 'source.docx'], (False, None, None, None)),
+        # Files but no format.
+        (['translate.py', 'source.docx', 'glossary.txt'], (False, None, None, None)),
+        # No source file only glossary file.
+        (['translate.py', 'docx', 'glossary.txt'], (False, None, None, None)),
+        # No source file only glossary file.
+        (['translate.py', 'tmx', 'glossary.txt'], (False, None, None, None)),
         # Too many args.
-        (['translate.py', 'source.docx', 'glossary.txt', 'random.pdf'], (False, None, None)),
-        # Incorrect translation file type.
-        (['translate.py', 'source.doc'], (False, None, None)),
+        (['translate.py', 'docx', 'source.docx', 'glossary.txt', 'random.pdf'], (False, None, None, None)),
+        # Incorrect translation file type without glossary.
+        (['translate.py', 'tmx', 'source.doc'], (False, None, None, None)),
+        # Incorrect translation file type with glossary.
+        (['translate.py', 'tmx', 'source.doc', 'glossary.txt'], (False, None, None, None)),
         # Incorrect glossary file type.
-        (['translate.py', 'source.docx', 'glossary.docx'], (False, None, None)),
+        (['translate.py', 'docx', 'source.docx', 'glossary.docx'], (False, None, None, None)),
         # Just glossary file given.
-        (['translate.py', 'glossary.txt'], (False, None, None)),
+        (['translate.py', 'glossary.txt'], (False, None, None, None)),
     ]
 )
 def test_user_input_check(user_input, expected):
