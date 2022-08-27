@@ -10,3 +10,5 @@ htmlcov/
 source_docs/
 document_translate.py
 .tmx
+output/
+
