@@ -19,34 +19,41 @@ class Segment():
 def check_user_input(user_input):
 
     format_message = (
-        "Expected input: python3 translate.py translation.docx glossary.txt\n"
+        "Expected input: python3 translate.py tmx/docx translation.docx glossary.txt\n"
         "(glossary.txt is optional.)"
     )
 
-    # Should be 2 or 3 args
-    if len(user_input) < 2 or len(user_input) > 3:
+    # Should be 3 or 4 args
+    if len(user_input) < 3 or len(user_input) > 4:
         print("Error: Incorrect number of arguments.")
         print(format_message)
-        return False, None, None
+        return False, None, None, None
 
-    # 2nd arg should be a docx file
-    translation_file = user_input[1]
-    if not translation_file.lower().endswith('.docx'):
-        print("Error: Second argument should be a docx file.")
+    # 2nd arg should be "tmx" or "docx" specifying the output format
+    output_format = user_input[1]
+    if output_format != "tmx" and output_format != "docx":
+        print('Error: Second argument should be "tmx" or "docx" specifying the output format.')
         print(format_message)
-        return False, None, None
+        return False, None, None, None
 
-    # 3rd arg, if present, should be a txt file
-    if len(user_input) == 3:
-        glossary_file = user_input[2]
+    # 3rd arg should be a docx file
+    translation_file = user_input[2]
+    if not translation_file.lower().endswith('.docx'):
+        print("Error: Third argument should be the docx file to be translated.")
+        print(format_message)
+        return False, None, None, None
+
+    # 4th arg, if present, should be a txt file
+    if len(user_input) == 4:
+        glossary_file = user_input[3]
         if not glossary_file.lower().endswith('.txt'):
-            print("Error: Third argument should be a txt file.")
+            print('Error: Fourth argument should be a ".txt" file.')
             print(format_message)
-            return False, None, None
+            return False, None, None, None
     else:
         glossary_file = None
 
-    return True, translation_file, glossary_file
+    return True, output_format, translation_file, glossary_file
 
 
 def setup_deepl_translator():
@@ -268,7 +275,7 @@ def output_deepl_usage(translator):
 
 if __name__ == "__main__":
 
-    valid, source_file, glossary_file = check_user_input(sys.argv)
+    valid, output_format, source_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
 
