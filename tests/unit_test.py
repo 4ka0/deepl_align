@@ -494,3 +494,11 @@ def test_output_deepl_usage(mock_deepl_translator):
         "Current DeepL usage for this month: 300000 (monthly limit: 500000)"
     )
     assert output == expected
+
+
+def test_create_docx_file_exists(list_of_translated_segment_objects):
+    pass
+
+
+def test_create_docx_file_content(list_of_translated_segment_objects):
+    pass
