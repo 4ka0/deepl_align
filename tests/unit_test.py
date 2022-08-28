@@ -18,6 +18,8 @@ from environs import Env
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+# Test classes and fixtures
+
 class MockDeeplGlossary():
     def __init__(self, glossary_name, source_lang, target_lang, entries):
         self.usage = Mock()
@@ -133,6 +135,8 @@ def list_of_segment_objects_from_file():
     segments = translate.get_source_segments(full_file_path)
     return segments
 
+
+# Actual test functions
 
 def test_segment_constructor(segment_object):
     assert isinstance(segment_object, Segment)
