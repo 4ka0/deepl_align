@@ -501,7 +501,22 @@ def test_output_deepl_usage(mock_deepl_translator):
 
 
 def test_create_docx_file_exists(list_of_translated_segment_objects):
-    pass
+
+    parent_dir = os.path.join(BASE_DIR, os.pardir)
+    docx_file_path = os.path.join(parent_dir, "output/test-docx-file.docx")
+
+    docx_name = "test-docx-file"
+    translate.create_docx(docx_name, list_of_translated_segment_objects)
+
+    assert os.path.exists(docx_file_path) is True
+
+    # Clean up after test
+    try:
+        os.remove(docx_file_path)
+    except OSError:
+        pass
+
+    assert os.path.exists(docx_file_path) is False
 
 
 def test_create_docx_file_content(list_of_translated_segment_objects):
