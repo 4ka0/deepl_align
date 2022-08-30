@@ -245,8 +245,7 @@ def create_docx(docx_name, translated_segments):
     docx_path = "output/" + docx_filename
 
     document = Document()
-    table = document.add_table(rows=1, cols=2)
-    table.style = "Table Grid"
+    table = document.add_table(rows=1, cols=2, style="Table Grid")
 
     for segment in translated_segments:
         row_cells = table.add_row().cells
