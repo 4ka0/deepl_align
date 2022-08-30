@@ -524,6 +524,11 @@ def test_create_docx_file_table_structure(list_of_translated_segment_objects):
     docx_name = "test-docx-file"
     translate.create_docx(docx_name, list_of_translated_segment_objects)
     document = Document("output/test-docx-file.docx")
+    assert len(document.paragraphs) == 0
     assert len(document.tables) == 1
     assert len(document.tables[0].columns) == 2
     assert len(document.tables[0].rows) == 10
+
+
+def test_create_docx_file_table_content(list_of_translated_segment_objects):
+    pass
