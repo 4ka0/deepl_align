@@ -526,4 +526,4 @@ def test_create_docx_file_table_structure(list_of_translated_segment_objects):
     document = Document("output/test-docx-file.docx")
     assert len(document.tables) == 1
     assert len(document.tables[0].columns) == 2
-    assert len(document.tables[0].rows) == 11
+    assert len(document.tables[0].rows) == 10
