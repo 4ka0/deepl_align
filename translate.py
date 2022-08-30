@@ -247,7 +247,13 @@ def create_docx(docx_name, translated_segments):
     document = Document()
     table = document.add_table(rows=1, cols=2, style="Table Grid")
 
-    for segment in translated_segments:
+    # Populate first row
+    row_1_cells = table.row_cells(0)
+    row_1_cells[0].text = str(translated_segments[0].source_text)
+    row_1_cells[1].text = str(translated_segments[0].target_text)
+
+    # Populate subsequent rows
+    for segment in translated_segments[1:]:
         row_cells = table.add_row().cells
         row_cells[0].text = str(segment.source_text)
         row_cells[1].text = str(segment.target_text)
