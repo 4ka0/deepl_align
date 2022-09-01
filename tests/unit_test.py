@@ -137,6 +137,14 @@ def list_of_segment_objects_from_file():
     return segments
 
 
+def file_clean_up(file_path):
+    try:
+        os.remove(file_path)
+    except OSError:
+        pass
+    assert os.path.exists(file_path) is False
+
+
 # Actual test functions
 
 def test_segment_constructor(segment_object):
@@ -361,13 +369,7 @@ def test_create_tmx_file_exists(list_of_translated_segment_objects):
 
     assert os.path.exists(tmx_file_path) is True
 
-    # Clean up after test
-    try:
-        os.remove(tmx_file_path)
-    except OSError:
-        pass
-
-    assert os.path.exists(tmx_file_path) is False
+    file_clean_up(tmx_file_path)
 
 
 def test_create_tmx_file_content(list_of_translated_segment_objects):
@@ -476,11 +478,7 @@ def test_create_tmx_file_content(list_of_translated_segment_objects):
     # Clean up after test
     parent_dir = os.path.join(BASE_DIR, os.pardir)
     tmx_file_path = os.path.join(parent_dir, "output/test-tmx-file.tmx")
-    try:
-        os.remove(tmx_file_path)
-    except OSError:
-        pass
-    assert os.path.exists(tmx_file_path) is False
+    file_clean_up(tmx_file_path)
 
 
 def test_get_filename():
@@ -511,13 +509,7 @@ def test_create_docx_file_exists(list_of_translated_segment_objects):
 
     assert os.path.exists(docx_file_path) is True
 
-    # Clean up after test
-    try:
-        os.remove(docx_file_path)
-    except OSError:
-        pass
-
-    assert os.path.exists(docx_file_path) is False
+    file_clean_up(docx_file_path)
 
 
 def test_create_docx_file_check_table_structure(list_of_translated_segment_objects):
@@ -546,10 +538,4 @@ def test_create_docx_file_check_table_content(list_of_translated_segment_objects
         assert row.cells[0].text == "正孔輸送層12"
         assert row.cells[1].text == "positive hole transport layers 12"
 
-    # Clean up after test
-    try:
-        os.remove(docx_file_path)
-    except OSError:
-        pass
-
-    assert os.path.exists(docx_file_path) is False
+    file_clean_up(docx_file_path)
