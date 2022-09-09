@@ -1,4 +1,4 @@
-# Kikai to tmx/docx
+# DeepL to tmx/docx
 
 A command line script for translating a docx file using the DeepL API.
 
