@@ -5,7 +5,7 @@ import os
 from unittest.mock import Mock
 
 from .. import translate
-from .. translate import Segment
+from ..translate import Segment
 
 import pytest
 import deepl
