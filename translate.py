@@ -4,23 +4,23 @@
 import os
 import sys
 
-# Third party packages
 import deepl
 from environs import Env
 from docx import Document
 
 
-class Segment():
+class Segment:
     def __init__(self, source_text, target_text):
         self.source_text = source_text
         self.target_text = target_text
 
 
 def check_user_input(user_input):
-
     format_message = (
-        "Expected input: python3 translate.py tmx/docx translation.docx glossary.txt\n"
-        "(The glossary file is optional.)"
+        "Expected input:\n"
+        "  python translate.py tmx/docx translation.docx glossary.txt\n"
+        'Choose either "tmx" or "docx".\n'
+        "The glossary text file is optional."
     )
 
     # Should be 3 or 4 args
@@ -32,13 +32,15 @@ def check_user_input(user_input):
     # 2nd arg should be "tmx" or "docx" specifying the output format
     output_format = user_input[1]
     if output_format != "tmx" and output_format != "docx":
-        print('Error: Second argument should be "tmx" or "docx" specifying the output format.')
+        print(
+            'Error: Second argument should be "tmx" or "docx" specifying the output format.'
+        )
         print(format_message)
         return False, None, None, None
 
     # 3rd arg should be a docx file
     translation_file = user_input[2]
-    if not translation_file.lower().endswith('.docx'):
+    if not translation_file.lower().endswith(".docx"):
         print("Error: Third argument should be the docx file to be translated.")
         print(format_message)
         return False, None, None, None
@@ -46,7 +48,7 @@ def check_user_input(user_input):
     # 4th arg, if present, should be a txt file
     if len(user_input) == 4:
         glossary_file = user_input[3]
-        if not glossary_file.lower().endswith('.txt'):
+        if not glossary_file.lower().endswith(".txt"):
             print('Error: Fourth argument should be a ".txt" file.')
             print(format_message)
             return False, None, None, None
@@ -72,13 +74,12 @@ def get_source_segments(source_file):
     sentences.
     """
 
-    print("Extracting text from \"" + source_file + "\".")
+    print('Extracting text from "' + source_file + '".')
 
     document = Document(source_file)
     segments = []
 
     for para in document.paragraphs:
-
         # Split again if paragraph contains multiple sentences.
         if para.text.count("。") >= 2:
             sentences = para.text.split("。")
@@ -136,7 +137,6 @@ def extract_glossary_entries(glossary_file):
     try:
         with open(glossary_file, encoding="utf-8") as f:
             for line in f:
-
                 # Only add to entries if:
                 # - there are two entries on a line
                 # - both entries are not just whitespace
@@ -152,10 +152,7 @@ def extract_glossary_entries(glossary_file):
                             entries[source] = target
 
     except Exception as e:
-        print(
-            "An error occurred when reading your glossary file.\n"
-            "Error details:"
-        )
+        print("An error occurred when reading your glossary file.\n" "Error details:")
         print(e)
         sys.exit()
 
@@ -199,12 +196,10 @@ def create_deepl_glossary(translator, glossary_name, entries):
 
 
 def translate_segments(translator, segments, glossary):
-
-    print("Translating text (this may take a little while).")
+    print("Getting the translation from DeepL (this may take a little while) ...")
 
     # Perform translation using glossary
     if glossary:
-
         # Get translation for each segment, one segment at a time
         for segment in segments:
             if segment.source_text:
@@ -240,9 +235,7 @@ def translate_segments(translator, segments, glossary):
 
 
 def create_docx(docx_name, translated_segments):
-
-    docx_filename = docx_name + ".docx"
-    docx_path = "output/" + docx_filename
+    output_file = docx_name + "-translated.docx"
 
     document = Document()
     table = document.add_table(rows=1, cols=2, style="Table Grid")
@@ -258,84 +251,78 @@ def create_docx(docx_name, translated_segments):
         row_cells[0].text = str(segment.source_text)
         row_cells[1].text = str(segment.target_text)
 
-    document.save(docx_path)
-    print("DOCX file created in \"" + docx_path + "\".")
+    document.save(output_file)
+    print('Translation saved as "' + output_file + '".')
 
 
 def create_tmx(tmx_name, translated_segments):
+    output_file = tmx_name + "-translated.tmx"
 
-    tmx_filename = tmx_name + ".tmx"
-    tmx_path = "output/" + tmx_filename
-
-    with open(tmx_path, 'w') as f:
-
+    with open(output_file, "w") as f:
         # Write the start of the tmx file
         f.write(
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<!DOCTYPE tmx SYSTEM "tmx11.dtd">\n'
             '<tmx version="1.1">\n'
-            '  <header creationtool="DeepL-to-tmx" adminlang="EN-US" datatype="plaintext" '
+            '  <header creationtool="deepl-allign" adminlang="EN-US" datatype="plaintext" '
             'segtype="sentence" srclang="JA"/>\n'
-            '  <body>\n'
+            "  <body>\n"
         )
 
         # Append the content of each segment to the tmx file
         for segment in translated_segments:
             f.write(
-                '    <tu>\n'
+                "    <tu>\n"
                 '      <tuv lang="JA">\n'
-                '        <seg>' + str(segment.source_text) + '</seg>\n'
-                '      </tuv>\n'
+                "        <seg>" + str(segment.source_text) + "</seg>\n"
+                "      </tuv>\n"
                 '      <tuv lang="EN-US">\n'
-                '        <seg>' + str(segment.target_text) + '</seg>\n'
-                '      </tuv>\n'
-                '    </tu>\n'
+                "        <seg>" + str(segment.target_text) + "</seg>\n"
+                "      </tuv>\n"
+                "    </tu>\n"
             )
 
         # Write the end of the tmx file
-        f.write(
-            '  </body>\n'
-            '</tmx>\n\n'
-        )
+        f.write("  </body>\n" "</tmx>\n\n")
 
-        print("TMX file created in \"" + tmx_path + "\".")
+        print('Translation saved as "' + output_file + '".')
 
 
 def output_deepl_usage(translator):
     usage = translator.get_usage()
     return (
-        "Current DeepL usage for this month: " +
-        str(usage.character.count) +
-        " (monthly limit: 500000)"
+        "Current DeepL usage for this month: "
+        + str(usage.character.count)
+        + " (monthly limit: 500000)"
     )
 
 
 if __name__ == "__main__":
-
     valid, output_format, source_file, glossary_file = check_user_input(sys.argv)
 
     if valid:
-
         translator = setup_deepl_translator()
         source_segments = get_source_segments(source_file)
         source_char_count = get_source_char_count(source_segments)
 
         if check_deepl_usage(source_char_count, translator):
-
             if glossary_file:
                 glossary_entries = extract_glossary_entries(glossary_file)
                 glossary_name = get_filename(glossary_file)
-                glossary = create_deepl_glossary(translator, glossary_name, glossary_entries)
-                translated_segments = translate_segments(translator, source_segments, glossary)
+                glossary = create_deepl_glossary(
+                    translator, glossary_name, glossary_entries
+                )
+                translated_segments = translate_segments(
+                    translator, source_segments, glossary
+                )
             else:
-                translated_segments = translate_segments(translator, source_segments, None)
+                translated_segments = translate_segments(
+                    translator, source_segments, None
+                )
 
         else:
             output_deepl_usage(translator)
-            print(
-                "The monthly limit has been reached."
-                "Please try again next month."
-            )
+            print("The monthly limit has been reached." "Please try again next month.")
             sys.exit()
 
         file_name = get_filename(source_file)
