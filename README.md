@@ -1,6 +1,6 @@
 ## DeepL Align
 
-A command line script for translating a docx file using the DeepL API.<br>
+A command line script for translating a docx file using the DeepL API.<br><br>
 The translation is output as a tmx file or as a docx file table with the source and target text segments ***fully aligned***.
 
 ### Built using:
