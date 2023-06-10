@@ -41,7 +41,7 @@ Then, using the terminal:
 
 4. Create and activate a virtual environment.<br>
 (Example using venv:)<br>
-`python3 -m venv venv`
+`python3 -m venv venv`<br>
 `source venv/bin/activate`
 
 5. Update pip (package manager).<br>
@@ -51,6 +51,7 @@ Then, using the terminal:
 `python -m pip install -r requirements.txt`
 
 7. In the root directory of the project, create a file called `.env`.<br>
+`touch .env`<br>
 In the `.env` file, write the following line.<br>
 `export AUTH_KEY=(your DeepL authentication key)`<br>
 Note there should be no space after the equals sign.<br>
@@ -58,11 +59,11 @@ And replace "(your DeepL authentication key)" with your actual key
 
 6. Run the script.<br>
 To output a docx file:<br>
-`python translate docx source-text.docx`<br>
+`python translate.py docx source-text.docx`<br>
 To output a tmx file:<br>
-`python translate tmx source-text.docx`<br>
+`python translate.py tmx source-text.docx`<br>
 To provide DeepL with a glossary of preferred terms to be used in the translation:<br>
-`python translate tmx source-text.docx glossary.txt`<br>
+`python translate.py tmx source-text.docx glossary.txt`<br>
 Note that the glossary should be a tab-delimited text file having the following format on each line.<br>
 `source-term<tab>target-term`<br>
 (Replace `<tab>` with an actual tab character.)
